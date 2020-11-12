@@ -12,26 +12,15 @@ const publicDirectoryPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirectoryPath));
 
-let count = 0;
-
-/**
- * server (emit) -> client (receive) => countUpdated
- * client (emit) -> server (receive) => increment
- */
-
 io.on('connection', (socket) => {
-    console.log('New web socket connection');
-    socket.emit('countUpdated', count);
-    socket.on('increment', () => {
-        count++;
-        // The below line only emits the event to the current connection and not to all connections. We need to broadcast the event to all connections
-        // socket.emit('countUpdated', count);
-        
-        // This emits to all connections
-        io.emit('countUpdated', count);
+    // This is the entry point on connection establishment, we'll continue to interact with established connections inside this method
+    socket.emit('message', 'Welcome!');
+
+    socket.on('sendMessage', (message) => {
+        io.emit('message', message);
     });
 });
 
 server.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
+	console.log(`Server is listening on port ${port}`);
 });

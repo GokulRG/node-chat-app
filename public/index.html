@@ -6,8 +6,14 @@
     <title>Chat App</title>
 </head>
 <body>
-    <h1>Chat App!</h1>
-    <button id="incrementButton">Increment</button>
+    <h1>Chat App!</h1> <br/>
+    
+    <form id="message-form">
+        <input type="text" name="message" placeholder="Type your message here"> <br/>
+    <br/>
+    <button type="submit">Send</button>
+    </form>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/chat.js"></script>
 </body>
