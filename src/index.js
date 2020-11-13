@@ -2,6 +2,7 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
+const Filter = require('bad-words');
 
 const app = express();
 const server = http.createServer(app);
@@ -19,18 +20,27 @@ io.on('connection', (socket) => {
 	// This event is emitted to all connections except the current connection/socket.
 	socket.broadcast.emit('message', 'A new user has joined the chat!');
 
-	socket.on('sendMessage', (message) => {
+	// the callback is for ack
+	socket.on('sendMessage', (message, callback) => {
+		const filter = new Filter();
+
+		if (filter.isProfane(message)) {
+			return callback('Profanity is not allowed in the chat!!');
+		}
 		// Send it to all connections including the current connection
 		io.emit('message', message);
-    });
-    
-    socket.on('sendLocation', (location) => {
-        io.emit('message', `https://google.com/maps?q=${location.latitude},${location.longitude}`);
-    });
+		callback();
+	});
+
+	// Adding ack callback
+	socket.on('sendLocation', (location, callback) => {
+		io.emit('message', `https://google.com/maps?q=${location.latitude},${location.longitude}`);
+		callback();
+	});
 
 	// A disconnect will be handled like so and not what you expect, like io.on (disconnect) or anything like that.
-    // Also once a socket disconnects, you can't do anythiing on that socket object anymore since it has already disconnected. 
-    // so we can use io.emit to broadcast to the other connections(here it would work like socket.broadcast.emit)
+	// Also once a socket disconnects, you can't do anythiing on that socket object anymore since it has already disconnected.
+	// so we can use io.emit to broadcast to the other connections(here it would work like socket.broadcast.emit)
 	socket.on('disconnect', () => {
 		io.emit('message', 'A user has left the chat!');
 	});
