@@ -13,12 +13,27 @@ const publicDirectoryPath = path.join(__dirname, '../public');
 app.use(express.static(publicDirectoryPath));
 
 io.on('connection', (socket) => {
-    // This is the entry point on connection establishment, we'll continue to interact with established connections inside this method
-    socket.emit('message', 'Welcome!');
+	// This is the entry point on connection establishment, we'll continue to interact with established connections inside this method
+	socket.emit('message', 'Welcome!');
 
-    socket.on('sendMessage', (message) => {
-        io.emit('message', message);
+	// This event is emitted to all connections except the current connection/socket.
+	socket.broadcast.emit('message', 'A new user has joined the chat!');
+
+	socket.on('sendMessage', (message) => {
+		// Send it to all connections including the current connection
+		io.emit('message', message);
     });
+    
+    socket.on('sendLocation', (location) => {
+        io.emit('message', `https://google.com/maps?q=${location.latitude},${location.longitude}`);
+    });
+
+	// A disconnect will be handled like so and not what you expect, like io.on (disconnect) or anything like that.
+    // Also once a socket disconnects, you can't do anythiing on that socket object anymore since it has already disconnected. 
+    // so we can use io.emit to broadcast to the other connections(here it would work like socket.broadcast.emit)
+	socket.on('disconnect', () => {
+		io.emit('message', 'A user has left the chat!');
+	});
 });
 
 server.listen(port, () => {

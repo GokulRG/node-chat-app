@@ -15,3 +15,15 @@ document.getElementById('message-form').addEventListener('submit', (event) => {
 	socket.emit('sendMessage', message);
 	resetFields();
 });
+
+document.getElementById('share-location').addEventListener('click', (event) => {
+	event.preventDefault();
+	if (!navigator.geolocation) {
+		return alert('Geolocation isn\'t supported in this browser');
+	}
+
+	// This still doesn't work with promises.. so we're using callback method
+	navigator.geolocation.getCurrentPosition((position) => {
+		socket.emit('sendLocation', {latitude: position.coords.latitude, longitude: position.coords.longitude});
+	});
+});
