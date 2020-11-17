@@ -5,12 +5,19 @@ const $messageForm = document.getElementById('message-form');
 const $messageFormInput = $messageForm.querySelector('input');
 const $messageFormButton = $messageForm.querySelector('button');
 const $sendLocationButton = document.getElementById('share-location');
+const $messages = document.querySelector('#messages');
 
 // server (emit) -> client (receive) -- acknowledgement --> server
 // client (emit) -> server (receive) -- acknowledgement --> client
 
+// Templates
+const messageTemplate = document.querySelector('#message-template').innerHTML;
+
 socket.on('message', (message) => {
-	console.log(message);
+	// console.log(message);
+	// Removing the render from console and render it in the div
+	const html = Mustache.render(messageTemplate, { message });
+	$messages.insertAdjacentHTML('beforeend', html);
 });
 
 function resetFields() {
