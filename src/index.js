@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
+const { generateMessage } = require('./utils/messages');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,10 +16,10 @@ app.use(express.static(publicDirectoryPath));
 
 io.on('connection', (socket) => {
 	// This is the entry point on connection establishment, we'll continue to interact with established connections inside this method
-	socket.emit('message', 'Welcome!');
+	socket.emit('message', generateMessage('Welcome!'));
 
 	// This event is emitted to all connections except the current connection/socket.
-	socket.broadcast.emit('message', 'A new user has joined the chat!');
+	socket.broadcast.emit('message', generateMessage('A new user has joined the chat!'));
 
 	// the callback is for ack
 	socket.on('sendMessage', (message, callback) => {
@@ -28,7 +29,7 @@ io.on('connection', (socket) => {
 			return callback('Profanity is not allowed in the chat!!');
 		}
 		// Send it to all connections including the current connection
-		io.emit('message', message);
+		io.emit('message', generateMessage(message));
 		callback();
 	});
 
@@ -42,7 +43,7 @@ io.on('connection', (socket) => {
 	// Also once a socket disconnects, you can't do anythiing on that socket object anymore since it has already disconnected.
 	// so we can use io.emit to broadcast to the other connections(here it would work like socket.broadcast.emit)
 	socket.on('disconnect', () => {
-		io.emit('message', 'A user has left the chat!');
+		io.emit('message', generateMessage('A user has left the chat!'));
 	});
 });
 

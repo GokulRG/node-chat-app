@@ -17,7 +17,10 @@ const locationTemplate = document.querySelector('#location-template').innerHTML;
 socket.on('message', (message) => {
 	// console.log(message);
 	// Removing the render from console and render it in the div
-	const html = Mustache.render(messageTemplate, { message });
+	const html = Mustache.render(messageTemplate, {
+		message: message.text,
+		createdAt: moment(message.createdAt).format('h:mm a')
+	});
 	$messages.insertAdjacentHTML('beforeend', html);
 });
 
