@@ -12,11 +12,18 @@ const $messages = document.querySelector('#messages');
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML;
+const locationTemplate = document.querySelector('#location-template').innerHTML;
 
 socket.on('message', (message) => {
 	// console.log(message);
 	// Removing the render from console and render it in the div
 	const html = Mustache.render(messageTemplate, { message });
+	$messages.insertAdjacentHTML('beforeend', html);
+});
+
+socket.on('locationMessage', (location) => {
+	// Rendering the location message as a link in the div
+	const html = Mustache.render(locationTemplate, { location });
 	$messages.insertAdjacentHTML('beforeend', html);
 });
 
