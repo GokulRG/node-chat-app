@@ -15,11 +15,18 @@ const publicDirectoryPath = path.join(__dirname, '../public');
 app.use(express.static(publicDirectoryPath));
 
 io.on('connection', (socket) => {
-	// This is the entry point on connection establishment, we'll continue to interact with established connections inside this method
-	socket.emit('message', generateMessage('Welcome!'));
+	// Listener for join
+	socket.on('join', ({ username, room }) => {
+		// Once you join a room you get access to additional funcitionality to address connections specific to that room alone
+		// io.to(room).emit;socket.broadcast.to(room).emit
+		socket.join(room);
 
-	// This event is emitted to all connections except the current connection/socket.
-	socket.broadcast.emit('message', generateMessage('A new user has joined the chat!'));
+		// This is the entry point on connection establishment, we'll continue to interact with established connections inside this method
+		socket.emit('message', generateMessage('Welcome!'));
+
+		// This event is emitted to all connections in the room except the current connection/socket.
+		socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined the chat!`));
+	});
 
 	// the callback is for ack
 	socket.on('sendMessage', (message, callback) => {
