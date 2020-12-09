@@ -1,12 +1,14 @@
-const generateMessage = (message) => {
+const generateMessage = (message, username = 'ChatBot') => {
     return {
+        username,
         text: message,
         createdAt: new Date().getTime()
     }
 };
 
-const generateLocationMessage = (location) => {
+const generateLocationMessage = (username, location) => {
     return {
+        username,
         url: `https://google.com/maps?q=${location.latitude},${location.longitude}`,
         createdAt: new Date().getTime()
     }
